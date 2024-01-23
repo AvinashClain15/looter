@@ -6,7 +6,7 @@ class Inventory: ObservableObject {
     @Published var loot = ["Epée", "Bouclier", "Armure","Baguette magique","Mandragore"]
 
     @Published var realLoot: [LootItem] = [
-        LootItem(quantity: 2, name: "Magic Potion", type: ItemType.magic, rarity: Rarity.legendary, attackStrenght: 10, game: availableGames[0]),
+        LootItem(quantity: 1, name: "Magic Potion", type: ItemType.magic, rarity: Rarity.legendary, attackStrenght: 10, game: availableGames[0]),
         
         LootItem(quantity: 2, name: "Baguette", type: ItemType.magic, rarity: Rarity.epic, attackStrenght: 10, game: availableGames[1]),
         
@@ -25,9 +25,8 @@ class Inventory: ObservableObject {
 
 struct ContentView: View {
     @ObservedObject var inventory = Inventory()
-    
     @State var showAddItemView = false
-   
+
     var body: some View {
         NavigationStack {
             List {
@@ -36,20 +35,25 @@ struct ContentView: View {
                 }, label: {
                     Text("Ajouter")
                 })
+                
                 ForEach(inventory.realLoot, id: \.self) { item in
-                    HStack{
-                        Circle()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(item.rarity.color)
-                        Text(item.name + "\n")
-                        Text("Quantité : " + String(item.quantity))
-                        Text( item.type.rawValue)
-                        
+                    NavigationLink {
+                        LootDetailView(item: item) // On passe directement l'item à la vue
+                    } label: {
+                        HStack{
+                            Circle()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(item.rarity.color)
+                            Text(item.name + "\n")
+                            Text("Quantité : " + String(item.quantity))
+                            Text( item.type.rawValue)
                             
+                                
+                        }
+                        .padding()
                     }
-                    .padding()
-                    
                 }
+              
             }
             .sheet(isPresented: $showAddItemView, content: {
                 AddItemView().environmentObject(inventory)
